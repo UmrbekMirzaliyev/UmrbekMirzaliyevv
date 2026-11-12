@@ -1,0 +1,965 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+/* ===== Qoʻshimcha qulayliklar va moslashuvchan dizayn ===== */
+:root { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+body { min-height: 100vh; }
+button, input, textarea { -webkit-tap-highlight-color: transparent; }
+button { touch-action: manipulation; }
+.bar-actions { display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap; }
+.theme-toggle {
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  min-height:42px; padding:8px 13px; border:1px solid var(--line);
+  border-radius:999px; background:var(--surface); color:var(--ink);
+  font:700 13px var(--font-body); cursor:pointer; transition:background .2s,border-color .2s,transform .2s;
+}
+.theme-toggle:hover { background:var(--surface-2); border-color:var(--accent); }
+.theme-toggle:active { transform:scale(.97); }
+.theme-icon { font-size:18px; line-height:1; }
+.nav-help { color:var(--muted); font-size:12px; margin:-5px 0 10px; }
+.panel { box-shadow:0 8px 28px rgba(70,25,48,.045); transition:background .2s,border-color .2s; }
+.btn, .opt, .navgrid button { transition:background .18s,border-color .18s,transform .18s,filter .18s; }
+.btn:active, .opt:active { transform:scale(.985); }
+.opt { min-height:58px; }
+.opt .lt { flex-shrink:0; }
+.qtext { line-height:1.35; }
+.timer { white-space:nowrap; }
+.navgrid button { min-width:40px; min-height:40px; }
+.navgrid button:focus-visible, .opt:focus-visible, .btn:focus-visible, .theme-toggle:focus-visible {
+  outline:3px solid var(--gold); outline-offset:3px;
+}
+.drop { transition:border-color .2s,background .2s; }
+textarea:focus, .field input:focus { outline:3px solid var(--accent-soft); border-color:var(--accent); }
+.foot { padding-bottom:max(10px, env(safe-area-inset-bottom)); }
+@media (min-width:761px) {
+  .side { position:sticky; top:16px; }
+  #quiz .panel { padding:clamp(20px,3vw,30px); }
+}
+@media (max-width:760px) {
+  body { font-size:15px; padding-left:max(12px,env(safe-area-inset-left)); padding-right:max(12px,env(safe-area-inset-right)); padding-bottom:max(24px,env(safe-area-inset-bottom)); }
+  .bar { align-items:flex-start; padding-block:12px; gap:10px; }
+  .brand { font-size:19px; }
+  .bar-actions { width:100%; justify-content:space-between; gap:8px; }
+  nav { flex:1; gap:3px; }
+  nav a { padding:8px 10px; font-size:13px; }
+  .theme-toggle { min-height:40px; padding:7px 10px; }
+  .theme-label { display:none; }
+  .hero { padding-block:18px 22px; gap:12px; }
+  .hero h1 { font-size:clamp(29px,8vw,42px); }
+  .hero p.lead, .page-title p { font-size:15px; }
+  .flower { max-width:112px; }
+  .panel { padding:15px; border-radius:16px; }
+  .panel h2 { font-size:20px; }
+  .grid2 { gap:12px; }
+  .drop { min-height:130px; }
+  textarea { min-height:150px; font-size:13px; }
+  .settings { grid-template-columns:1fr; gap:12px; }
+  .qlayout { gap:18px; }
+  .qhead { align-items:flex-start; }
+  .qtext { font-size:clamp(21px,6vw,27px); }
+  .opt { grid-template-columns:34px minmax(0,1fr); gap:10px; padding:11px; min-height:56px; }
+  .qnav { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .qnav .spacer { display:none; }
+  .qnav #finish { grid-column:1 / -1; }
+  .side { border-top:1px solid var(--line); padding-top:16px; }
+  .navgrid { grid-template-columns:repeat(auto-fill,minmax(38px,1fr)); max-height:190px; overflow-y:auto; padding:2px 3px 5px 2px; }
+  .navgrid button { min-height:42px; }
+  .score { justify-items:center; text-align:center; }
+  .score > div:last-child { width:100%; }
+  .score .row { justify-content:center; }
+  .score .row .btn { flex:1 1 145px; }
+  .review li { padding:12px; }
+  .two { gap:12px; }
+  .maker { padding-block:18px; gap:12px; }
+  .maker .flower { order:-1; }
+  .foot { margin-top:26px; font-size:12px; }
+}
+@media (max-width:380px) {
+  nav a { padding:7px 8px; font-size:12px; }
+  .brand { font-size:17px; }
+  .theme-toggle { padding:7px 9px; }
+  .btn { padding:10px 13px; font-size:14px; }
+  .qnav .btn { width:100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+}
+
+</style></head><body>
+<title>Guli uchun test ishlash platformasi</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#fcf5f8">
+<meta name="description" content="Guli uchun qulay, moslashuvchan test ishlash platformasi.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Manrope:wght@400;500;600;800&display=swap">
+<style>
+/* Layout: chap tomonga tekislangan keng ustun; tepada sekin oqib turuvchi e'lon lentasi, menyu, so'ng sahifalar (Testlar / Qo'llanma / Yaratuvchi). Rang: gul-atirgul + barg yashili. */
+:root {
+  --bg: #fcf5f8;
+  --surface: #ffffff;
+  --surface-2: #f8e9ef;
+  --ink: #2a1422;
+  --muted: #766070;
+  --line: #ecd8e1;
+  --accent: #c2255c;
+  --on-accent: #ffffff;
+  --accent-soft: #fbdbe7;
+  --leaf: #2b7a57;
+  --leaf-soft: #dcf1e6;
+  --gold: #f0b03a;
+  --ok: #1d8a5a;
+  --ok-soft: #dcf3e8;
+  --bad: #c0392b;
+  --bad-soft: #fbe1de;
+  --petal-a: #e0447c;
+  --petal-b: #f59bbb;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #190e15; --surface: #26151f; --surface-2: #33202b; --ink: #f8eaf1; --muted: #bfa3b3;
+    --line: #432a38; --accent: #ff7fa9; --on-accent: #2a0f1b; --accent-soft: #4a2336; --leaf: #6fcf9d;
+    --leaf-soft: #1f3a2d; --gold: #f2b84a; --ok: #5fd99f; --ok-soft: #1c3a2c; --bad: #ff8a7d; --bad-soft: #472320;
+    --petal-a: #ff7fa9; --petal-b: #a8486d; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #190e15; --surface: #26151f; --surface-2: #33202b; --ink: #f8eaf1; --muted: #bfa3b3;
+  --line: #432a38; --accent: #ff7fa9; --on-accent: #2a0f1b; --accent-soft: #4a2336; --leaf: #6fcf9d;
+  --leaf-soft: #1f3a2d; --gold: #f2b84a; --ok: #5fd99f; --ok-soft: #1c3a2c; --bad: #ff8a7d; --bad-soft: #472320;
+  --petal-a: #ff7fa9; --petal-b: #a8486d; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.6;
+  padding-block: 0 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 1040px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+p { margin: 0; }
+a { color: var(--accent); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.eyebrow { font-size: 12px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--leaf); }
+
+/* e'lon lentasi */
+.ticker { background: var(--ink); color: var(--bg); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; overflow: hidden; white-space: nowrap; margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))) calc(-1 * max(16px, env(safe-area-inset-right, 0px))); }
+.ticker-track { display: inline-flex; animation: slide 28s linear infinite; padding-block: 5px; }
+.ticker-item { display: inline-flex; align-items: center; gap: 14px; padding-right: 14px; }
+.ticker-item i { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); display: inline-block; }
+@keyframes slide { to { transform: translateX(-50%); } }
+
+/* menyu */
+.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; padding-block: 16px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-family: var(--font-display); font-weight: 800; font-size: 20px; }
+.brand svg { width: 34px; height: 34px; }
+nav { display: flex; gap: 6px; flex-wrap: wrap; }
+nav a { text-decoration: none; color: var(--muted); font-weight: 800; font-size: 14px; padding: 8px 14px; border-radius: 999px; }
+nav a:hover { background: var(--surface-2); color: var(--ink); }
+nav a[aria-current="page"] { background: var(--accent); color: var(--on-accent); }
+
+/* hero */
+.hero { display: grid; grid-template-columns: 1fr 240px; gap: 24px 40px; align-items: center; padding-block: 28px 32px; }
+.hero > * { min-width: 0; }
+.hero h1 { font-size: clamp(30px, 5.6vw, 54px); font-weight: 800; text-transform: uppercase; margin-block: 10px 14px; }
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero p.lead { color: var(--muted); max-width: 52ch; font-size: 17px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.chip { font-size: 13px; font-weight: 700; background: var(--leaf-soft); color: var(--leaf); padding: 5px 12px; border-radius: 999px; }
+.flower { width: 100%; max-width: 240px; justify-self: end; }
+.flower .spin { transform-origin: 110px 110px; animation: turn 80s linear infinite; }
+.flower .petals { transform-origin: 110px 110px; animation: bloom 1.4s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes turn { to { transform: rotate(360deg); } }
+@keyframes bloom { from { transform: scale(.55) rotate(-30deg); opacity: .35; } }
+
+/* panel va tugmalar */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
+.panel + .panel { margin-top: 16px; }
+.panel h2 { font-size: 22px; margin-bottom: 4px; }
+.panel .sub { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+.btn { font: inherit; font-weight: 800; font-size: 15px; border: 2px solid var(--accent); background: var(--accent); color: var(--on-accent); padding: 11px 20px; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; justify-content: center; }
+.btn:hover { filter: brightness(1.06); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.ghost { background: transparent; color: var(--accent); }
+.btn.ghost:hover { background: var(--accent-soft); }
+.btn.sm { padding: 7px 14px; font-size: 13px; border-radius: 10px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid2 > * { min-width: 0; }
+.drop { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 6px; min-height: 190px; border: 2px dashed var(--accent); background: var(--accent-soft); border-radius: 14px; padding: 18px; cursor: pointer; }
+.drop.over { background: var(--surface-2); border-style: solid; }
+.drop strong { font-family: var(--font-display); font-size: 19px; }
+.drop span { color: var(--muted); font-size: 14px; }
+.drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.drop:focus-within { outline: 3px solid var(--accent); outline-offset: 2px; }
+textarea { width: 100%; min-height: 190px; resize: vertical; font-family: var(--font-mono); font-size: 13px; line-height: 1.5; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+label.lbl { font-size: 13px; font-weight: 800; display: block; margin-bottom: 6px; }
+
+.loadinfo { margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: var(--ok-soft); color: var(--ink); font-size: 14px; }
+.loadinfo.err { background: var(--bad-soft); }
+.loadinfo b { font-weight: 800; }
+.warns { margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: var(--muted); }
+
+.settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px 24px; margin-bottom: 18px; }
+.seg { display: grid; gap: 8px; }
+.seg label { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; cursor: pointer; font-size: 14px; }
+.seg label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.seg small { display: block; color: var(--muted); font-size: 12.5px; }
+.seg input { margin-top: 4px; accent-color: var(--accent); }
+.field { display: grid; gap: 6px; font-size: 14px; }
+.field input[type=number] { font: inherit; width: 100%; max-width: 160px; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.check { display: flex; gap: 10px; align-items: center; font-size: 14px; cursor: pointer; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.stack { display: grid; gap: 12px; align-content: start; }
+
+.hist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.hist li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 12px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; font-size: 14px; }
+.hist b { font-weight: 800; }
+.hist .pct { font-family: var(--font-display); font-weight: 800; color: var(--accent); }
+.hist .when { color: var(--muted); font-size: 12.5px; }
+
+/* test oynasi */
+.qhead { display: flex; flex-wrap: wrap; gap: 10px 16px; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.qtitle { font-weight: 800; font-size: 14px; color: var(--leaf); }
+.timer { font-family: var(--font-mono); font-weight: 700; font-size: 15px; background: var(--surface-2); padding: 5px 12px; border-radius: 999px; font-variant-numeric: tabular-nums; }
+.timer.low { background: var(--bad-soft); color: var(--bad); }
+.progress { height: 8px; background: var(--surface-2); border-radius: 999px; overflow: hidden; margin-bottom: 18px; }
+.progress i { display: block; height: 100%; background: var(--accent); border-radius: 999px; transition: width .25s; }
+.qlayout { display: grid; grid-template-columns: 1fr 210px; gap: 20px; align-items: start; }
+.qlayout > * { min-width: 0; }
+.qno { font-size: 13px; font-weight: 800; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
+.qtext { font-family: var(--font-display); font-size: clamp(21px, 3.4vw, 28px); font-weight: 600; margin-bottom: 18px; overflow-wrap: anywhere; }
+.opts { display: grid; gap: 10px; }
+.opt { font: inherit; text-align: left; color: var(--ink); background: var(--surface); border: 2px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: center; cursor: pointer; overflow-wrap: anywhere; }
+.opt:hover:not(:disabled) { border-color: var(--accent); }
+.opt .lt { width: 34px; height: 34px; border-radius: 50%; background: var(--surface-2); display: grid; place-items: center; font-weight: 800; font-size: 14px; }
+.opt.sel { border-color: var(--accent); background: var(--accent-soft); }
+.opt.sel .lt { background: var(--accent); color: var(--on-accent); }
+.opt.ok { border-color: var(--ok); background: var(--ok-soft); }
+.opt.ok .lt { background: var(--ok); color: var(--surface); }
+.opt.bad { border-color: var(--bad); background: var(--bad-soft); }
+.opt.bad .lt { background: var(--bad); color: var(--surface); }
+.opt:disabled { cursor: default; color: var(--ink); }
+.fb { margin-top: 14px; font-weight: 700; font-size: 15px; }
+.fb.ok { color: var(--ok); } .fb.bad { color: var(--bad); }
+.qnav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.qnav .spacer { flex: 1; }
+.navgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); gap: 6px; }
+.navgrid button { font: inherit; font-weight: 800; font-size: 13px; height: 36px; border-radius: 10px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.navgrid button.done { background: var(--surface-2); }
+.navgrid button.ok { background: var(--ok-soft); border-color: var(--ok); }
+.navgrid button.bad { background: var(--bad-soft); border-color: var(--bad); }
+.navgrid button.cur { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.side h3 { font-size: 15px; margin-bottom: 10px; }
+.confirm { margin-top: 16px; padding: 14px; border-radius: 12px; background: var(--surface-2); display: grid; gap: 10px; }
+
+/* natija */
+.score { display: grid; grid-template-columns: 150px 1fr; gap: 20px 28px; align-items: center; }
+.score > * { min-width: 0; }
+.ring { width: 150px; height: 150px; position: relative; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring .n { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 34px; }
+.score h2 { font-size: clamp(24px, 4vw, 34px); margin-bottom: 8px; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 16px; }
+.stat { font-size: 13.5px; font-weight: 700; padding: 5px 12px; border-radius: 999px; background: var(--surface-2); }
+.stat.ok { background: var(--ok-soft); color: var(--ok); } .stat.bad { background: var(--bad-soft); color: var(--bad); }
+.review { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.review li { border: 1px solid var(--line); border-radius: 14px; padding: 14px; background: var(--surface); overflow-wrap: anywhere; }
+.review .q { font-weight: 800; margin-bottom: 6px; }
+.review .a { font-size: 14px; color: var(--muted); }
+.pill { display: inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 2px 9px; border-radius: 999px; margin-right: 8px; vertical-align: 1px; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); } .pill.bad { background: var(--bad-soft); color: var(--bad); } .pill.skip { background: var(--surface-2); color: var(--muted); }
+
+/* qo'llanma */
+.page-title { padding-block: 24px 20px; }
+.page-title h1 { font-size: clamp(30px, 5vw, 46px); font-weight: 800; margin-top: 8px; }
+.page-title p { color: var(--muted); max-width: 58ch; margin-top: 10px; font-size: 17px; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: s; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 40px 1fr; gap: 14px; align-items: start; }
+.steps li::before { content: counter(s); width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 18px; }
+.steps b { display: block; font-size: 17px; }
+.steps span { color: var(--muted); font-size: 15px; }
+.codewrap { position: relative; }
+pre.code { margin: 0; background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 16px; font-family: var(--font-mono); font-size: 13.5px; line-height: 1.6; overflow-x: auto; white-space: pre; }
+.codewrap .btn { margin-top: 10px; }
+.rules { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.rules li::marker { color: var(--accent); }
+kbd { font-family: var(--font-mono); font-size: 12.5px; background: var(--surface-2); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px; padding: 1px 7px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.two > * { min-width: 0; }
+.two .panel + .panel { margin-top: 0; }
+
+/* yaratuvchi */
+.maker { display: grid; grid-template-columns: 1fr 240px; gap: 24px 40px; align-items: center; padding-block: 28px; }
+.maker > * { min-width: 0; }
+.maker h1 { font-size: clamp(34px, 7vw, 64px); font-weight: 800; margin-block: 10px 12px; }
+.maker .role { font-weight: 800; color: var(--accent); }
+.made { font-size: 18px; max-width: 46ch; margin-top: 12px; }
+.quote { background: var(--accent-soft); border-radius: 18px; padding: 24px; font-family: var(--font-display); font-size: clamp(20px, 3vw, 28px); font-weight: 600; line-height: 1.25; text-wrap: balance; }
+.quote small { display: block; margin-top: 10px; font-family: var(--font-body); font-size: 13px; font-weight: 700; color: var(--muted); }
+.cards3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 16px; }
+.cards3 .panel { margin: 0; }
+.cards3 h3 { font-size: 18px; margin-bottom: 6px; }
+.cards3 p { color: var(--muted); font-size: 15px; }
+
+.foot { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; }
+
+@media (max-width: 760px) {
+  .hero, .maker { grid-template-columns: 1fr; }
+  .flower { justify-self: start; max-width: 160px; order: -1; }
+  .grid2, .two, .qlayout { grid-template-columns: 1fr; }
+  .score { grid-template-columns: 1fr; }
+  .panel { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track, .flower .spin, .flower .petals { animation: none; }
+  html { scroll-behavior: auto; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="bloom" viewBox="0 0 220 220">
+      <g class="spin">
+        <g class="petals">
+          <g transform="translate(110 110)">
+            <g fill="var(--petal-b)">
+              <ellipse cx="0" cy="-62" rx="20" ry="42" transform="rotate(18)"/><ellipse cx="0" cy="-62" rx="20" ry="42" transform="rotate(54)"/><ellipse cx="0" cy="-62" rx="20" ry="42" transform="rotate(90)"/><ellipse cx="0" cy="-62" rx="20" ry="42" transform="rotate(126)"/><ellipse cx="0" cy="-62" rx="20" ry="42" transform="rotate(162)"/><ellipse cx="0" cy="-62" rx="20" ry="42" transform="rotate(198)"/><ellipse cx="0" cy="-62" rx="20" ry="42" transform="rotate(234)"/><ellipse cx="0" cy="-62" rx="20" ry="42" transform="rotate(270)"/><ellipse cx="0" cy="-62" rx="20" ry="42" transform="rotate(306)"/><ellipse cx="0" cy="-62" rx="20" ry="42" transform="rotate(342)"/>
+            </g>
+            <g fill="var(--petal-a)">
+              <ellipse cx="0" cy="-46" rx="17" ry="34"/><ellipse cx="0" cy="-46" rx="17" ry="34" transform="rotate(36)"/><ellipse cx="0" cy="-46" rx="17" ry="34" transform="rotate(72)"/><ellipse cx="0" cy="-46" rx="17" ry="34" transform="rotate(108)"/><ellipse cx="0" cy="-46" rx="17" ry="34" transform="rotate(144)"/><ellipse cx="0" cy="-46" rx="17" ry="34" transform="rotate(180)"/><ellipse cx="0" cy="-46" rx="17" ry="34" transform="rotate(216)"/><ellipse cx="0" cy="-46" rx="17" ry="34" transform="rotate(252)"/><ellipse cx="0" cy="-46" rx="17" ry="34" transform="rotate(288)"/><ellipse cx="0" cy="-46" rx="17" ry="34" transform="rotate(324)"/>
+            </g>
+            <circle r="20" fill="var(--gold)"/>
+            <circle r="9" fill="var(--ink)" opacity=".18"/>
+          </g>
+        </g>
+      </g>
+    </symbol>
+    <symbol id="mini" viewBox="0 0 40 40">
+      <g transform="translate(20 20)" fill="var(--petal-a)">
+        <ellipse cx="0" cy="-10" rx="5.5" ry="9"/><ellipse cx="0" cy="-10" rx="5.5" ry="9" transform="rotate(72)"/><ellipse cx="0" cy="-10" rx="5.5" ry="9" transform="rotate(144)"/><ellipse cx="0" cy="-10" rx="5.5" ry="9" transform="rotate(216)"/><ellipse cx="0" cy="-10" rx="5.5" ry="9" transform="rotate(288)"/>
+        <circle r="5" fill="var(--gold)"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <div class="ticker" role="status" aria-label="Sayt test rejimida ishlamoqda">
+    <div class="ticker-track" aria-hidden="true">
+      <span class="ticker-item">Sayt test rejimida ishlamoqda <i></i> Sayt test rejimida ishlamoqda <i></i> Sayt test rejimida ishlamoqda <i></i> Sayt test rejimida ishlamoqda <i></i></span>
+      <span class="ticker-item">Sayt test rejimida ishlamoqda <i></i> Sayt test rejimida ishlamoqda <i></i> Sayt test rejimida ishlamoqda <i></i> Sayt test rejimida ishlamoqda <i></i></span>
+    </div>
+  </div>
+
+  <header class="bar">
+    <a class="brand" href="#testlar"><svg aria-hidden="true"><use href="#mini"/></svg><span>Guli Test</span></a>
+    <div class="bar-actions">
+      <nav aria-label="Menyu">
+        <a href="#testlar" data-view="testlar">Testlar</a>
+        <a href="#qollanma" data-view="qollanma">Qoʻllanma</a>
+        <a href="#yaratuvchi" data-view="yaratuvchi">Yaratuvchi</a>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Qorongʻi rejimni yoqish" title="Kunduzgi / tungi rejim">
+        <span class="theme-icon" aria-hidden="true">☾</span>
+        <span class="theme-label">Tungi rejim</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============ TESTLAR ============ -->
+  <main>
+  <section id="v-testlar">
+    <div class="hero">
+      <div>
+        <span class="eyebrow">.txt fayldan test ishlash</span>
+        <h1>Guli uchun test ishlash <em>platformasi</em></h1>
+        <p class="lead">Savollaringizni oddiy matn faylida yozing, shu yerga yuklang va ishlang. Natija darrov chiqadi, xatolar ustida qayta ishlash mumkin.</p>
+        <div class="chips"><span class="chip">.txt format</span><span class="chip">Darrov natija</span><span class="chip">Xatolar ustida ishlash</span></div>
+      </div>
+      <svg class="flower" viewBox="0 0 220 220" role="img" aria-label="Gul"><use href="#bloom"/></svg>
+    </div>
+
+    <!-- 1. sozlash -->
+    <div id="setup">
+      <div class="panel">
+        <h2>Testni yuklang</h2>
+        <p class="sub">Fayl tanlang, bu yerga tashlang yoki matnni oʻng tomondagi qutiga joylang. Hozir namuna test yuklangan.</p>
+        <div class="grid2">
+          <label class="drop" id="drop" style="position:relative">
+            <input type="file" id="file" accept=".txt,text/plain">
+            <strong>.txt faylni tanlang</strong>
+            <span>yoki faylni shu yerga tashlang</span>
+            <span class="btn sm ghost" style="margin-top:8px">Fayl tanlash</span>
+          </label>
+          <div>
+            <label class="lbl" for="src">Test matni</label>
+            <textarea id="src" spellcheck="false" aria-describedby="loadinfo"></textarea>
+          </div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn sm" id="reparse" type="button">Matndan yangilash</button>
+          <button class="btn sm ghost" id="sample" type="button">Namunani qaytarish</button>
+        </div>
+        <div class="loadinfo" id="loadinfo" role="status"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Sozlamalar</h2>
+        <p class="sub">Qanday ishlashni oʻzingiz tanlang.</p>
+        <div class="settings">
+          <div class="seg" role="radiogroup" aria-label="Rejim">
+            <label><input type="radio" name="mode" value="study" checked><span><b>Oʻrganish rejimi</b><small>Javob bergach darrov toʻgʻri-xatoligi koʻrinadi.</small></span></label>
+            <label><input type="radio" name="mode" value="exam"><span><b>Imtihon rejimi</b><small>Natija faqat oxirida chiqadi, javobni oʻzgartirish mumkin.</small></span></label>
+          </div>
+          <div class="stack">
+            <label class="check"><input type="checkbox" id="shufQ"> Savollarni aralashtirish</label>
+            <label class="check"><input type="checkbox" id="shufO"> Variantlarni aralashtirish</label>
+          </div>
+          <div class="stack">
+            <label class="field" for="cnt">Savollar soni (0 = hammasi)<input type="number" id="cnt" min="0" value="0" inputmode="numeric"></label>
+            <label class="field" for="mins">Vaqt, daqiqada (0 = cheksiz)<input type="number" id="mins" min="0" value="0" inputmode="numeric"></label>
+          </div>
+        </div>
+        <button class="btn" id="start" type="button">Testni boshlash</button>
+      </div>
+
+      <div class="panel" id="histPanel" hidden>
+        <h2>Soʻnggi natijalar</h2>
+        <p class="sub">Natijalar faqat shu qurilmada saqlanadi.</p>
+        <ul class="hist" id="hist"></ul>
+        <div class="row" style="margin-top:12px"><button class="btn sm ghost" id="clearHist" type="button">Tarixni tozalash</button></div>
+      </div>
+    </div>
+
+    <!-- 2. test oynasi -->
+    <div id="quiz" hidden>
+      <div class="panel">
+        <div class="qhead">
+          <span class="qtitle" id="qtitle"></span>
+          <span class="timer" id="timer">00:00</span>
+        </div>
+        <div class="progress" aria-hidden="true"><i id="bar" style="width:0"></i></div>
+        <div class="qlayout">
+          <div>
+            <div class="qno" id="qno"></div>
+            <div class="qtext" id="qtext"></div>
+            <div class="opts" id="opts"></div>
+            <div class="fb" id="fb" aria-live="polite"></div>
+            <div class="qnav">
+              <button class="btn ghost" id="prev" type="button">Oldingi</button>
+              <button class="btn" id="next" type="button">Keyingi</button>
+              <span class="spacer"></span>
+              <button class="btn ghost" id="finish" type="button">Yakunlash</button>
+            </div>
+            <div class="confirm" id="confirm" hidden>
+              <span id="confirmText"></span>
+              <div class="row"><button class="btn sm" id="yes" type="button">Ha, yakunlash</button><button class="btn sm ghost" id="no" type="button">Davom etish</button></div>
+            </div>
+          </div>
+          <aside class="side">
+            <h3>Savollar</h3>
+            <p class="nav-help">Raqamni bosib savolga oʻting</p>
+            <div class="navgrid" id="navgrid"></div>
+            <p class="sub" style="margin-top:12px;font-size:12.5px;color:var(--muted)">Klaviatura: <kbd>A</kbd>–<kbd>D</kbd> yoki <kbd>1</kbd>–<kbd>4</kbd>, <kbd>←</kbd> <kbd>→</kbd></p>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. natija -->
+    <div id="result" hidden>
+      <div class="panel">
+        <div class="score">
+          <div class="ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--surface-2)" stroke-width="11"/><circle id="ringArc" cx="60" cy="60" r="52" fill="none" stroke="var(--accent)" stroke-width="11" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"/></svg><div class="n" id="ringN">0%</div></div>
+          <div>
+            <span class="eyebrow" id="rTitle"></span>
+            <h2 id="rMsg"></h2>
+            <div class="stats" id="rStats"></div>
+            <div class="row">
+              <button class="btn" id="retryWrong" type="button">Xatolarni qayta ishlash</button>
+              <button class="btn ghost" id="again" type="button">Qayta boshlash</button>
+              <button class="btn ghost" id="newTest" type="button">Yangi test</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Javoblar tahlili</h2>
+        <p class="sub">Har bir savol boʻyicha sizning javobingiz va toʻgʻri javob.</p>
+        <ul class="review" id="review"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ QO'LLANMA ============ -->
+  <section id="v-qollanma" hidden>
+    <div class="page-title">
+      <span class="eyebrow">Qoʻllanma</span>
+      <h1>Sayt qanday ishlaydi</h1>
+      <p>Besh qadamda tayyorsiz. Hech narsa oʻrnatish va roʻyxatdan oʻtish shart emas.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Boshlash</h2>
+      <p class="sub">Testni birinchi marta ishlash uchun.</p>
+      <ol class="steps">
+        <li><div><b>Testni .txt faylga yozing</b><span>Bloknot, telefondagi qaydlar yoki istalgan matn muharriri ishlaydi. Faylni .txt koʻrinishida saqlang.</span></div></li>
+        <li><div><b>Testlar boʻlimida yuklang</b><span>Faylni tanlang yoki matnni qutiga joylang. Savollar soni darrov koʻrsatiladi.</span></div></li>
+        <li><div><b>Sozlamalarni tanlang</b><span>Rejim, aralashtirish, savollar soni va vaqtni belgilang. Hech narsa oʻzgartirmasangiz ham boʻladi.</span></div></li>
+        <li><div><b>Boshlang va javob bering</b><span>Variantni bosing yoki klaviaturada harfini yozing. Savollar roʻyxatidan istalganiga oʻtishingiz mumkin.</span></div></li>
+        <li><div><b>Natijani koʻring</b><span>Foiz, toʻgʻri va xato javoblar chiqadi. “Xatolarni qayta ishlash” tugmasi faqat xato savollarni qaytaradi.</span></div></li>
+      </ol>
+    </div>
+
+    <div class="panel">
+      <h2>Fayl formati</h2>
+      <p class="sub">Har bir savolni quyidagicha yozing. Savollar orasida boʻsh qator qoldiring.</p>
+      <div class="codewrap">
+        <pre class="code" id="fmt">Mavzu: Matematika
+
+1. 7 × 8 nechaga teng?
+A) 54
+B) 56
+C) 58
+D) 64
+Javob: B
+
+2. Eng kichik tub son qaysi?
+A) 0
+B) 1
+*C) 2
+D) 3</pre>
+        <button class="btn sm ghost" type="button" data-copy="fmt">Namunani nusxalash</button>
+      </div>
+      <ul class="rules" style="margin-top:18px">
+        <li>Savol raqam bilan boshlanadi: <b>1.</b> yoki <b>1)</b></li>
+        <li>Variantlar harf bilan yoziladi: <b>A)</b> <b>B)</b> <b>C)</b> <b>D)</b> (6 tagacha, kamida 2 ta).</li>
+        <li>Toʻgʻri javob ikki usulda belgilanadi: <b>Javob: B</b> qatori bilan yoki variant oldiga <b>*</b> qoʻyib.</li>
+        <li>Birinchi qatorda <b>Mavzu: ...</b> yozsangiz, test nomi shu boʻladi.</li>
+        <li>Fayl UTF-8 kodlashda boʻlsin, shunda oʻ, gʻ, sh, ch harflari buzilmaydi.</li>
+        <li>Toʻgʻri javobi yoʻq savol oʻtkazib yuboriladi va yuklash joyida ogohlantirish chiqadi.</li>
+      </ul>
+    </div>
+
+    <div class="two" style="margin-top:16px">
+      <div class="panel">
+        <h2>Ikki rejim</h2>
+        <p class="sub">Maqsadingizga qarab tanlang.</p>
+        <ul class="rules">
+          <li><b>Oʻrganish:</b> javob berishingiz bilan toʻgʻri variant yashil, xato variant qizil boʻladi. Bir savolga bir marta javob beriladi.</li>
+          <li><b>Imtihon:</b> hech narsa koʻrsatilmaydi, javobni oʻzgartirish mumkin. Hammasi yakunlanganda baholanadi.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h2>Maslahatlar</h2>
+        <p class="sub">Testni tezroq tayyorlash uchun.</p>
+        <ul class="rules">
+          <li>Sun’iy intellektdan shu formatda test yozib berishni soʻrang (pastdagi tayyor soʻrovdan foydalaning).</li>
+          <li>Vaqt belgilasangiz, tugashi bilan test oʻzi yakunlanadi.</li>
+          <li>Natijalar tarixi faqat shu brauzerda saqlanadi.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:16px">
+      <h2>Tayyor soʻrov</h2>
+      <p class="sub">Shuni nusxalab, mavzuni almashtiring va javobni .txt faylga joylang.</p>
+      <div class="codewrap">
+        <pre class="code" id="prompt" style="white-space:pre-wrap">[Mavzu] boʻyicha 20 ta test tuz. Har savol “1.” bilan boshlansin, variantlar A) B) C) D) shaklida boʻlsin va savol oxirida “Javob: X” qatori yozilsin. Savollar orasida boʻsh qator qoldir. Faqat oddiy matn ber, jadval va belgilar ishlatma.</pre>
+        <button class="btn sm ghost" type="button" data-copy="prompt">Soʻrovni nusxalash</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ YARATUVCHI ============ -->
+  <section id="v-yaratuvchi" hidden>
+    <div class="maker">
+      <div>
+        <span class="eyebrow">Yaratuvchi</span>
+        <h1>Mirzaliyev Umrbek</h1>
+        <p class="role">Sayt muallifi</p>
+        <p class="made">Sayt <b>Mirzaliyev Umrbek</b> tomonidan yaratildi. 
+      </div>
+      <svg class="flower" viewBox="0 0 220 220" role="img" aria-label="Gul"><use href="#bloom"/></svg>
+    </div>
+
+   
+
+    <div class="cards3">
+      
+      <div class="panel"><h3>Sinov rejimi</h3><p>Sayt hozir test rejimida ishlamoqda. Biror xato yoki yangi gʻoya topsangiz, yaratuvchiga ayting: platforma shu fikrlar bilan yaxshilanadi.</p></div>
+      <div class="panel"><h3>Keyingi rejalar</h3><p>Koʻproq test turlari, rasmli savollar va umumiy reyting kabi imkoniyatlar qoʻshilishi mumkin. Taklifingiz bo‘lsa, aytishdan tortinmang.</p></div>
+    </div>
+  </section>
+  </main>
+
+  <footer class="foot">
+    <span>Guli uchun test ishlash platformasi, 2026</span>
+    <span>Sayt Mirzaliyev Umrbek tomonidan yaratildi</span>
+  </footer>
+</div>
+
+<script>
+/* ---------- yordamchilar ---------- */
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const L = (i) => String.fromCharCode(65 + i);
+const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const fmtTime = (s) => { s = Math.max(0, Math.round(s)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
+
+/*PARSER*/
+function parseTests(raw) {
+  const lines = String(raw).replace(/^﻿/, '').replace(/\r/g, '').split('\n');
+  const qs = [], warns = [];
+  let title = '', cur = null;
+  const optRe = /^([*+]?)\s*\(?([A-Fa-f])[\)\.\:]\s*(.+)$/;
+  const ansRe = /^(?:to['ʻ’‘`]?g['ʻ’‘`]?ri\s+javob|javob|answer|correct)\s*[:=\-]\s*\(?([A-Fa-f])(?![A-Za-z0-9])/i;
+  const numRe = /^(\d+)\s*[\.\)\-:]\s*(.+)$/;
+  const wordRe = /^(?:savol|question)\s*\d*\s*[:.\)\-]\s*(.+)$/i;
+  const titleRe = /^(?:#\s*|(?:mavzu|nom|test nomi|title)\s*:\s*)(.+)$/i;
+  const sepRe = /^[#=\-_*~\s]{3,}$/;
+  const complete = (c) => c && (c.options.length > 0 || c.ansLetter !== null);
+  const finish = () => {
+    if (!cur) return;
+    const c = cur; cur = null;
+    const n = qs.length + warns.length + 1;
+    if (c.options.length < 2) { warns.push('Savol “' + c.text.slice(0, 40) + '”: kamida 2 ta variant kerak, oʻtkazib yuborildi.'); return; }
+    let ok = c.marked;
+    if (ok < 0 && c.ansLetter !== null) ok = c.ansLetter.toUpperCase().charCodeAt(0) - 65;
+    if (ok < 0 || ok >= c.options.length) { warns.push('Savol “' + c.text.slice(0, 40) + '”: toʻgʻri javob topilmadi, oʻtkazib yuborildi.'); return; }
+    qs.push({ text: c.text, options: c.options.map((t, i) => ({ t, ok: i === ok })) });
+  };
+  let blank = false;
+  for (let raw1 of lines) {
+    const line = raw1.trim();
+    if (!line || sepRe.test(line)) { blank = true; continue; }
+    const afterBlank = blank; blank = false;
+    let m;
+    if (cur && (m = line.match(ansRe))) { cur.ansLetter = m[1]; continue; }
+    if (cur && (m = line.match(optRe))) {
+      if (m[1]) cur.marked = cur.options.length;
+      cur.options.push(m[3].trim());
+      continue;
+    }
+    if (!cur && !qs.length && !title && (m = line.match(titleRe))) { title = m[1].trim(); continue; }
+    if ((m = line.match(numRe)) || (m = line.match(wordRe))) {
+      finish();
+      cur = { text: m[m.length - 1].trim(), options: [], marked: -1, ansLetter: null };
+      continue;
+    }
+    if (cur && !complete(cur)) { cur.text += ' ' + line; continue; }
+    if (cur && cur.options.length && !afterBlank) { cur.options[cur.options.length - 1] += ' ' + line; continue; }
+    finish();
+    cur = { text: line, options: [], marked: -1, ansLetter: null };
+  }
+  finish();
+  return { title, questions: qs, warns };
+}
+/*END PARSER*/
+
+const SAMPLE = `Mavzu: Umumiy bilimlar (namuna)
+
+1. Oʻzbekistonning poytaxti qaysi shahar?
+A) Samarqand
+B) Buxoro
+C) Toshkent
+D) Namangan
+Javob: C
+
+2. Oʻsimliklar fotosintez jarayonida qaysi gazni yutadi?
+A) Kislorod
+B) Karbonat angidrid
+C) Azot
+D) Vodorod
+Javob: B
+
+3. Quyosh sistemasidagi eng katta sayyora qaysi?
+A) Yupiter
+B) Saturn
+C) Yer
+D) Mars
+Javob: A
+
+4. Navroʻz bayrami qaysi sanada nishonlanadi?
+A) 1-yanvar
+B) 21-mart
+C) 1-sentabr
+D) 8-mart
+Javob: B
+
+5. 7 × 8 nechaga teng?
+A) 54
+B) 56
+C) 58
+D) 64
+Javob: B
+
+6. Amir Temur qaysi yilda tugʻilgan?
+A) 1336
+B) 1405
+C) 1220
+*D) 1370
+
+7. Alisher Navoiyning “Xamsa” asari nechta dostondan iborat?
+A) 3 ta
+B) 4 ta
+C) 5 ta
+D) 7 ta
+Javob: C
+
+8. Yilda nechta oy bor?
+A) 10
+B) 11
+C) 12
+Javob: C`;
+
+/* ---------- holat ---------- */
+let loaded = { title: '', questions: [], warns: [] };
+let Q = null, timerId = null;
+
+function setInfo(html, err) {
+  const el = $('#loadinfo');
+  el.className = 'loadinfo' + (err ? ' err' : '');
+  el.innerHTML = html;
+}
+function loadText(text, label) {
+  const r = parseTests(text);
+  loaded = r;
+  $('#src').value = text;
+  const ws = r.warns.length ? '<ul class="warns">' + r.warns.map((w) => '<li>' + esc(w) + '</li>').join('') + '</ul>' : '';
+  if (!r.questions.length) {
+    setInfo('<b>Savol topilmadi.</b> Qoʻllanma boʻlimidagi formatni tekshiring.' + ws, true);
+    $('#start').disabled = true;
+  } else {
+    setInfo('<b>' + esc(r.title || label || 'Test') + '</b>: ' + r.questions.length + ' ta savol yuklandi.' + ws, false);
+    $('#start').disabled = false;
+    $('#cnt').max = r.questions.length;
+  }
+}
+
+/* ---------- yuklash ---------- */
+const readFile = (f) => new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result)); fr.onerror = rej; fr.readAsText(f, 'utf-8'); });
+async function handleFile(f) {
+  if (!f) return;
+  try { loadText(await readFile(f), f.name.replace(/\.txt$/i, '')); }
+  catch (e) { setInfo('<b>Faylni oʻqib boʻlmadi.</b> Boshqa .txt fayl tanlang.', true); }
+}
+$('#file').addEventListener('change', (e) => handleFile(e.target.files[0]));
+const drop = $('#drop');
+['dragenter', 'dragover'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', (e) => handleFile(e.dataTransfer.files[0]));
+$('#reparse').addEventListener('click', () => loadText($('#src').value, 'Test'));
+$('#sample').addEventListener('click', () => loadText(SAMPLE, 'Namuna'));
+
+/* ---------- tarix ---------- */
+function getHist() { try { return JSON.parse(localStorage.getItem('guli-test-hist') || '[]'); } catch (e) { return []; } }
+function setHist(h) { try { localStorage.setItem('guli-test-hist', JSON.stringify(h)); } catch (e) {} }
+function renderHist() {
+  const h = getHist();
+  $('#histPanel').hidden = !h.length;
+  $('#hist').innerHTML = h.map((x) => '<li><span><b>' + esc(x.title) + '</b><br><span class="when">' + esc(x.when) + '</span></span><span><span class="pct">' + x.pct + '%</span> &nbsp;' + x.ok + '/' + x.total + '</span></li>').join('');
+}
+$('#clearHist').addEventListener('click', () => { setHist([]); renderHist(); });
+
+/* ---------- test ---------- */
+function show(id) { ['setup', 'quiz', 'result'].forEach((x) => { $('#' + x).hidden = x !== id; }); }
+
+function startQuiz(source, isRetry) {
+  let list = source.map((q) => ({ text: q.text, options: q.options.map((o) => ({ t: o.t, ok: o.ok })) }));
+  const mode = (document.querySelector('input[name=mode]:checked') || {}).value || 'study';
+  if ($('#shufQ').checked) list = shuffle(list);
+  const cnt = parseInt($('#cnt').value, 10) || 0;
+  if (!isRetry && cnt > 0 && cnt < list.length) list = list.slice(0, cnt);
+  if ($('#shufO').checked) list.forEach((q) => { q.options = shuffle(q.options); });
+  const mins = parseInt($('#mins').value, 10) || 0;
+  Q = { items: list, ans: list.map(() => null), i: 0, mode, limit: mins * 60, t0: Date.now(), title: loaded.title || 'Test', src: source, done: false };
+  $('#qtitle').textContent = Q.title + (isRetry ? ' (xatolar ustida ishlash)' : '');
+  show('quiz');
+  clearInterval(timerId);
+  tick(); timerId = setInterval(tick, 500);
+  renderQ();
+  window.scrollTo({ top: 0 });
+}
+function tick() {
+  if (!Q || Q.done) return;
+  const el = (Date.now() - Q.t0) / 1000;
+  const t = $('#timer');
+  if (Q.limit > 0) {
+    const left = Q.limit - el;
+    t.textContent = fmtTime(left);
+    t.classList.toggle('low', left <= 30);
+    if (left <= 0) finishQuiz();
+  } else { t.textContent = fmtTime(el); t.classList.remove('low'); }
+}
+function renderQ() {
+  const q = Q.items[Q.i], a = Q.ans[Q.i], n = Q.items.length;
+  const locked = Q.mode === 'study' && a !== null;
+  $('#qno').textContent = 'Savol ' + (Q.i + 1) + ' / ' + n;
+  $('#qtext').textContent = q.text;
+  $('#bar').style.width = (Q.ans.filter((x) => x !== null).length / n * 100) + '%';
+  $('#opts').innerHTML = q.options.map((o, i) => {
+    let cls = 'opt';
+    if (locked) { if (o.ok) cls += ' ok'; else if (i === a) cls += ' bad'; }
+    else if (a === i) cls += ' sel';
+    return '<button type="button" class="' + cls + '" data-i="' + i + '"' + (locked ? ' disabled' : '') + '><span class="lt">' + L(i) + '</span><span>' + esc(o.t) + '</span></button>';
+  }).join('');
+  const fb = $('#fb');
+  if (locked) {
+    const good = q.options[a].ok;
+    fb.className = 'fb ' + (good ? 'ok' : 'bad');
+    fb.textContent = good ? 'Toʻgʻri!' : 'Xato. Toʻgʻri javob: ' + L(q.options.findIndex((o) => o.ok)) + ') ' + q.options.find((o) => o.ok).t;
+  } else { fb.className = 'fb'; fb.textContent = ''; }
+  $('#prev').disabled = Q.i === 0;
+  $('#next').textContent = Q.i === n - 1 ? 'Oxirgi savol' : 'Keyingi';
+  $('#next').disabled = Q.i === n - 1;
+  $('#navgrid').innerHTML = Q.items.map((it, i) => {
+    let c = '';
+    if (Q.ans[i] !== null) c = Q.mode === 'study' ? (it.options[Q.ans[i]].ok ? 'ok' : 'bad') : 'done';
+    if (i === Q.i) c += ' cur';
+    return '<button type="button" class="' + c + '" data-n="' + i + '" aria-label="Savol ' + (i + 1) + '">' + (i + 1) + '</button>';
+  }).join('');
+  $('#confirm').hidden = true;
+}
+function pick(i) {
+  if (!Q || Q.done) return;
+  const q = Q.items[Q.i];
+  if (i >= q.options.length) return;
+  if (Q.mode === 'study' && Q.ans[Q.i] !== null) return;
+  Q.ans[Q.i] = i;
+  renderQ();
+}
+function go(n) { if (n < 0 || n >= Q.items.length) return; Q.i = n; renderQ(); }
+$('#opts').addEventListener('click', (e) => { const b = e.target.closest('.opt'); if (b) pick(+b.dataset.i); });
+$('#navgrid').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) go(+b.dataset.n); });
+$('#prev').addEventListener('click', () => go(Q.i - 1));
+$('#next').addEventListener('click', () => go(Q.i + 1));
+$('#finish').addEventListener('click', () => {
+  const blank = Q.ans.filter((x) => x === null).length;
+  if (!blank) return finishQuiz();
+  $('#confirmText').textContent = blank + ' ta savolga javob berilmagan. Baribir yakunlaysizmi?';
+  $('#confirm').hidden = false;
+});
+$('#yes').addEventListener('click', finishQuiz);
+$('#no').addEventListener('click', () => { $('#confirm').hidden = true; });
+document.addEventListener('keydown', (e) => {
+  if (!Q || Q.done || $('#quiz').hidden || $('#v-testlar').hidden) return;
+  if (e.target.matches('input,textarea') || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.key === 'ArrowRight') go(Q.i + 1);
+  else if (e.key === 'ArrowLeft') go(Q.i - 1);
+  else {
+    const k = e.key.toUpperCase();
+    if (/^[A-F]$/.test(k)) pick(k.charCodeAt(0) - 65);
+    else if (/^[1-6]$/.test(k)) pick(+k - 1);
+  }
+});
+
+function finishQuiz() {
+  if (!Q || Q.done) return;
+  Q.done = true; clearInterval(timerId);
+  const n = Q.items.length;
+  let ok = 0, bad = 0, blank = 0;
+  Q.items.forEach((it, i) => { const a = Q.ans[i]; if (a === null) blank++; else if (it.options[a].ok) ok++; else bad++; });
+  const pct = Math.round(ok / n * 100);
+  const secs = Math.min((Date.now() - Q.t0) / 1000, Q.limit > 0 ? Q.limit : 1e9);
+  Q.res = { ok, bad, blank, pct };
+  const msg = pct >= 90 ? 'Ajoyib natija!' : pct >= 70 ? 'Juda yaxshi!' : pct >= 50 ? 'Yaxshi, yana biroz mashq' : 'Hech qisi yoʻq, yana urinib koʻring';
+  $('#rTitle').textContent = Q.title;
+  $('#rMsg').textContent = msg;
+  $('#ringN').textContent = pct + '%';
+  show('result');
+  const arc = $('#ringArc');
+  arc.style.stroke = pct >= 50 ? 'var(--accent)' : 'var(--bad)';
+  arc.setAttribute('stroke-dashoffset', (326.7 * (1 - pct / 100)).toFixed(1));
+  $('#rStats').innerHTML = '<span class="stat ok">Toʻgʻri: ' + ok + '</span><span class="stat bad">Xato: ' + bad + '</span><span class="stat">Javobsiz: ' + blank + '</span><span class="stat">Vaqt: ' + fmtTime(secs) + '</span>';
+  $('#retryWrong').hidden = (bad + blank) === 0;
+  $('#review').innerHTML = Q.items.map((it, i) => {
+    const a = Q.ans[i], good = a !== null && it.options[a].ok;
+    const pill = a === null ? '<span class="pill skip">Javobsiz</span>' : good ? '<span class="pill ok">Toʻgʻri</span>' : '<span class="pill bad">Xato</span>';
+    const ci = it.options.findIndex((o) => o.ok);
+    let t = '';
+    if (a !== null && !good) t += 'Sizning javobingiz: ' + L(a) + ') ' + esc(it.options[a].t) + '<br>';
+    t += 'Toʻgʻri javob: <b>' + L(ci) + ') ' + esc(it.options[ci].t) + '</b>';
+    return '<li><div class="q">' + pill + (i + 1) + '. ' + esc(it.text) + '</div><div class="a">' + t + '</div></li>';
+  }).join('');
+  const h = getHist();
+  h.unshift({ title: Q.title, pct, ok, total: n, when: new Date().toLocaleString('uz-UZ', { dateStyle: 'medium', timeStyle: 'short' }) });
+  setHist(h.slice(0, 5));
+  window.scrollTo({ top: 0 });
+}
+$('#retryWrong').addEventListener('click', () => {
+  const wrong = Q.items.filter((it, i) => Q.ans[i] === null || !it.options[Q.ans[i]].ok);
+  const keepQ = $('#cnt').value; startQuiz(wrong, true); $('#cnt').value = keepQ;
+});
+$('#again').addEventListener('click', () => startQuiz(Q.src, false));
+$('#newTest').addEventListener('click', () => { Q = null; renderHist(); show('setup'); window.scrollTo({ top: 0 }); });
+$('#start').addEventListener('click', () => { if (loaded.questions.length) startQuiz(loaded.questions, false); });
+
+/* ---------- nusxalash ---------- */
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-copy]');
+  if (!b) return;
+  const el = document.getElementById(b.dataset.copy), old = b.textContent;
+  try { await navigator.clipboard.writeText(el.innerText); b.textContent = 'Nusxalandi'; }
+  catch (err) {
+    const r = document.createRange(); r.selectNodeContents(el);
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    b.textContent = 'Belgilandi: Ctrl+C bosing';
+  }
+  setTimeout(() => { b.textContent = old; }, 2200);
+});
+
+/* ---------- menyu ---------- */
+const VIEWS = ['testlar', 'qollanma', 'yaratuvchi'];
+function route() {
+  let h = (location.hash || '').slice(1);
+  if (!VIEWS.includes(h)) h = 'testlar';
+  VIEWS.forEach((v) => { document.getElementById('v-' + v).hidden = v !== h; });
+  document.querySelectorAll('nav a').forEach((a) => {
+    if (a.dataset.view === h) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  });
+  window.scrollTo({ top: 0 });
+}
+window.addEventListener('hashchange', route);
+
+
+/* ---------- kunduzgi / tungi rejim ---------- */
+const THEME_KEY = 'guli-test-theme';
+function applyTheme(theme) {
+  const dark = theme === 'dark';
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  const btn = $('#themeToggle');
+  if (btn) {
+    btn.querySelector('.theme-icon').textContent = dark ? '☀' : '☾';
+    btn.querySelector('.theme-label').textContent = dark ? 'Kunduzgi rejim' : 'Tungi rejim';
+    btn.setAttribute('aria-label', dark ? 'Kunduzgi rejimga oʻtish' : 'Qorongʻi rejimni yoqish');
+  }
+}
+function initTheme() {
+  let saved = null;
+  try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
+  const preferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(saved || (preferred ? 'dark' : 'light'));
+}
+$('#themeToggle').addEventListener('click', () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+});
+
+/* ---------- boshlanish ---------- */
+initTheme();
+loadText(SAMPLE, 'Namuna');
+renderHist();
+route();
+</script>
+
+</body></html>
